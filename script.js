@@ -50,6 +50,8 @@ class Life {
             }
         }
 
+        this.deadWave = this.deadWave.bind(this)
+
         if (this.option.autoRun) {
             requestAnimationFrame(this.deadWave)
         }
