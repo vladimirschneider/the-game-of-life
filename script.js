@@ -4,15 +4,11 @@ const CELL_SIZE = 10
 const LIFE_WIDTH = document.documentElement.offsetWidth
 const LIFE_HEIGHT = document.documentElement.offsetHeight
 
-class Life {
-    constructor(canvas, options) {
-        this.canvas = canvas
+const GAME_BOARD_BACKGROUND_COLOR = "#000000";
 
-        this.option = {
-            autoRun: true,
-            autoFill: true,
-            ...options,
-        };
+class Life {
+    constructor(canvas) {
+        this.canvas = canvas
 
         this.canvasWidth = LIFE_WIDTH / CELL_SIZE
         this.canvasHeight = LIFE_HEIGHT / CELL_SIZE
@@ -22,7 +18,7 @@ class Life {
 
         this.ctx = this.canvas.getContext("2d")
 
-        this.ctx.fillStyle = "#000000"
+        this.ctx.fillStyle = GAME_BOARD_BACKGROUND_COLOR
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height)
 
         this.cells = []
@@ -35,25 +31,23 @@ class Life {
             }
         }
 
-        if (this.option.autoFill) {
-            for (let i = 0; i < START_NUMBERS_OF_CELL; i++) {
-                const cellXPosition = Math.floor(Math.random() * this.canvasWidth)
-                const cellYPosition = Math.floor(Math.random() * this.canvasHeight)
+        for (let i = 0; i < START_NUMBERS_OF_CELL; i++) {
+            const cellXPosition = Math.floor(Math.random() * this.canvasWidth)
+            const cellYPosition = Math.floor(Math.random() * this.canvasHeight)
 
-                const cellX = Math.floor(cellXPosition)
-                const cellY = Math.floor(cellYPosition)
+            const cellX = Math.floor(cellXPosition)
+            const cellY = Math.floor(cellYPosition)
 
-                if (!this.cells[cellX][cellY]) {
-                    this.cells[cellX][cellY] = new Cell(this.ctx, cellXPosition, cellYPosition, false)
-                }
+            if (!this.cells[cellX][cellY]) {
+                this.cells[cellX][cellY] = new Cell(this.ctx, cellXPosition, cellYPosition, false)
+
+                this.cells[cellX][cellY].draw()
             }
         }
 
         this.deadWave = this.deadWave.bind(this)
 
-        if (this.option.autoRun) {
-            requestAnimationFrame(this.deadWave)
-        }
+        requestAnimationFrame(this.deadWave)
     }
 
     deadWave() {
@@ -65,35 +59,35 @@ class Life {
 
                 let countAroundCells = 0
 
-                if (i !== 0 && j !== 0 && this.cells[i - 1][j - 1] && !this.cells[i - 1][j - 1].newCell) {
+                if (i !== 0 && j !== 0 && this.cells[i - 1][j - 1] && !this.cells[i - 1][j - 1].newborn) {
                     countAroundCells += 1
                 }
 
-                if (i !== 0 && this.cells[i - 1][j] && !this.cells[i - 1][j].newCell) {
+                if (i !== 0 && this.cells[i - 1][j] && !this.cells[i - 1][j].newborn) {
                     countAroundCells += 1
                 }
 
-                if (i !== 0 && j < this.canvasHeight - 1 && this.cells[i - 1][j + 1] && !this.cells[i - 1][j + 1].newCell) {
+                if (i !== 0 && j < this.canvasHeight - 1 && this.cells[i - 1][j + 1] && !this.cells[i - 1][j + 1].newborn) {
                     countAroundCells += 1
                 }
 
-                if (j < this.canvasHeight - 1 && this.cells[i][j + 1] && !this.cells[i][j + 1].newCell) {
+                if (j < this.canvasHeight - 1 && this.cells[i][j + 1] && !this.cells[i][j + 1].newborn) {
                     countAroundCells += 1
                 }
 
-                if (i < this.canvasWidth - 1 && j < this.canvasHeight - 1 && this.cells[i + 1][j + 1] && !this.cells[i + 1][j + 1].newCell) {
+                if (i < this.canvasWidth - 1 && j < this.canvasHeight - 1 && this.cells[i + 1][j + 1] && !this.cells[i + 1][j + 1].newborn) {
                     countAroundCells += 1
                 }
 
-                if (i < this.canvasWidth - 1 && this.cells[i + 1][j] && !this.cells[i + 1][j].newCell) {
+                if (i < this.canvasWidth - 1 && this.cells[i + 1][j] && !this.cells[i + 1][j].newborn) {
                     countAroundCells += 1
                 }
 
-                if (i < this.canvasWidth - 1 && j !== 0 && this.cells[i + 1][j - 1] && !this.cells[i + 1][j - 1].newCell) {
+                if (i < this.canvasWidth - 1 && j !== 0 && this.cells[i + 1][j - 1] && !this.cells[i + 1][j - 1].newborn) {
                     countAroundCells += 1
                 }
 
-                if (j !== 0 && this.cells[i][j - 1] && !this.cells[i][j - 1].newCell) {
+                if (j !== 0 && this.cells[i][j - 1] && !this.cells[i][j - 1].newborn) {
                     countAroundCells += 1
                 }
 
@@ -115,7 +109,7 @@ class Life {
         for (let i = 0; i < this.canvasWidth; i++) {
             for (let j = 0; j < this.canvasHeight; j++) {
                 if (this.cells[i][j]) {
-                    this.cells[i][j].newCell = false;
+                    this.cells[i][j].newborn = false;
 
                     if (this.cells[i][j].neighbors !== 2 && this.cells[i][j].neighbors !== 3) {
                         this.cells[i][j].dead()
@@ -131,25 +125,41 @@ class Life {
 }
 
 class Cell {
-    constructor(ctx, x, y, newCell = true) {
+    #neighbors = 0
+
+    constructor(ctx, x, y, newborn = true) {
         this.ctx = ctx
 
         this.x = x
         this.y = y
 
-        this.newCell = newCell
-        this.neighbors = null
+        this.newborn = newborn
+    }
 
-        this.draw()
+    get position() {
+        return [
+            this.x * CELL_SIZE,
+            this.y * CELL_SIZE,
+            CELL_SIZE,
+            CELL_SIZE,
+        ]
     }
 
     draw(color = "#ffffff") {
         this.ctx.fillStyle = color
-        this.ctx.fillRect(this.x * CELL_SIZE, this.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+        this.ctx.fillRect(...this.position)
     }
 
     dead() {
-        this.ctx.fillStyle = "#000000"
-        this.ctx.fillRect(this.x * CELL_SIZE, this.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+        this.ctx.fillStyle = GAME_BOARD_BACKGROUND_COLOR
+        this.ctx.fillRect(...this.position)
+    }
+
+    set neighbors(neighbors) {
+        this.#neighbors = neighbors
+    }
+
+    get neighbors() {
+        return this.#neighbors
     }
 }
