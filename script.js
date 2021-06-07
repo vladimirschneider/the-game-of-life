@@ -1,6 +1,5 @@
-const START_NUMBER_OF_CELL = 2000
+const START_NUMBERS_OF_CELL = 2000
 const CELL_SIZE = 10
-const LIFE_TIMEOUT = 50
 
 const LIFE_WIDTH = document.documentElement.offsetWidth
 const LIFE_HEIGHT = document.documentElement.offsetHeight
@@ -37,7 +36,7 @@ class Life {
         }
 
         if (this.option.autoFill) {
-            for (let i = 0; i < START_NUMBER_OF_CELL; i++) {
+            for (let i = 0; i < START_NUMBERS_OF_CELL; i++) {
                 const cellXPosition = Math.floor(Math.random() * this.canvasWidth)
                 const cellYPosition = Math.floor(Math.random() * this.canvasHeight)
 
