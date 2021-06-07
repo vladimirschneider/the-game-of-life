@@ -98,10 +98,7 @@ class Life {
 
                     this.cells[i][j].neighbors = 2
 
-                    const r = Math.floor(Math.random() * (255 - 100) + 100)
-                    const g = Math.floor(Math.random() * (255 - 100) + 100)
-                    const b = Math.floor(Math.random() * (255 - 100) + 100)
-                    this.cells[i][j].draw(`rgb(${r}, ${g}, ${b})`)
+                    this.cells[i][j].draw(this.randomColor)
                 }
             }
         }
@@ -121,6 +118,14 @@ class Life {
         }
 
         requestAnimationFrame(this.deadWave)
+    }
+
+    get randomColor() {
+        const r = Math.floor(Math.random() * (255 - 100) + 100)
+        const g = Math.floor(Math.random() * (255 - 100) + 100)
+        const b = Math.floor(Math.random() * (255 - 100) + 100)
+
+        return `rgb(${r}, ${g}, ${b})`
     }
 }
 
