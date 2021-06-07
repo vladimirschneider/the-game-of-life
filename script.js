@@ -35,13 +35,10 @@ class Life {
             const cellXPosition = Math.floor(Math.random() * this.canvasWidth)
             const cellYPosition = Math.floor(Math.random() * this.canvasHeight)
 
-            const cellX = Math.floor(cellXPosition)
-            const cellY = Math.floor(cellYPosition)
+            if (!this.cells[cellXPosition][cellYPosition]) {
+                this.cells[cellXPosition][cellYPosition] = new Cell(this.ctx, cellXPosition, cellYPosition, false)
 
-            if (!this.cells[cellX][cellY]) {
-                this.cells[cellX][cellY] = new Cell(this.ctx, cellXPosition, cellYPosition, false)
-
-                this.cells[cellX][cellY].draw()
+                this.cells[cellXPosition][cellYPosition].draw()
             }
         }
 
@@ -96,8 +93,6 @@ class Life {
                 } else if (countAroundCells === 3) {
                     this.cells[i][j] = new Cell(this.ctx, i, j)
 
-                    this.cells[i][j].neighbors = 2
-
                     this.cells[i][j].draw(this.randomColor)
                 }
             }
@@ -106,9 +101,9 @@ class Life {
         for (let i = 0; i < this.canvasWidth; i++) {
             for (let j = 0; j < this.canvasHeight; j++) {
                 if (this.cells[i][j]) {
-                    this.cells[i][j].newborn = false;
-
-                    if (this.cells[i][j].neighbors !== 2 && this.cells[i][j].neighbors !== 3) {
+                    if (this.cells[i][j].newborn) {
+                        this.cells[i][j].newborn = false;
+                    } else if (this.cells[i][j].neighbors !== 2 && this.cells[i][j].neighbors !== 3) {
                         this.cells[i][j].dead()
 
                         this.cells[i][j] = undefined
